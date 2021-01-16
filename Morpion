@@ -1,0 +1,86 @@
+from tkinter import *
+
+class Morpion:
+    def __init__(self):
+        self.window = Tk()
+        self.window.title("Morpion")
+        self.frame_canvas = Frame(self.window)
+        self.draw = Canvas(self.frame_canvas, width=500, height=500, bg="white", bd=8)
+        self.morpion()
+        self.frame_canvas.pack()
+        self.draw.pack()
+        self.grid_draw()
+
+        button = Button(self.window, text='Recomencer', command=self.reload)
+        button.pack()
+
+        self.window.mainloop()
+
+    def morpion(self):
+        self.frame = Frame(self.window)
+        text_position = Label(self.frame, text='Position : ').grid(row=0, column=0)
+        self.position = Entry(self.frame)
+        self.position.grid(row=0, column=1)
+        button = Button(self.frame, text='valider', command=self.drawing).grid(row=1, column=1)
+
+        self.symbol_1 = "x"
+        self.symbol_2 = "o"
+        self.turn = 0
+        self.grid = [None,None,None,None,None,None,None,None,None]
+
+        self.frame.pack()
+
+    def reload(self):
+        self.window.destroy()
+        Morpion()
+
+    def drawing(self):
+        pos = self.position.get()
+        if pos.isdigit() and 0 <= (pos := int(pos)-1) <= 8 and self.grid[pos] is None:
+            x = pos % 3
+            y = 1 * (pos > 2) + 1 * (pos > 5)
+            x0, x1, y0, y1 = 20 + 160 * x, 150 + 160 * x, 20 + 160 * y, 150 + 160 * y
+
+            if self.turn % 2 == 0:
+                self.draw.create_line(x0, y0, x1, y1, width=5)
+                self.draw.create_line(x1, y0, x0, y1, width=5)
+                self.grid[pos] = "x"
+            else:
+                self.draw.create_oval(x0, y0, x1, y1, width=5)
+                self.grid[pos] = "o"
+
+            if self.verification():
+                win_text = Label(self.window, text=f'La personne ayant comme symbole : "{self.pawn}" a gagné !')
+                win_text.pack()
+
+            self.turn += 1
+
+        self.position.delete(0, END)
+
+    def verification(self):
+        if self.turn % 2 == 0:
+            self.pawn = self.symbol_1
+        else:
+            self.pawn = self.symbol_2
+        H1=self.grid[0] == self.pawn and self.grid[1] == self.pawn and self.grid[2] == self.pawn
+        H2=self.grid[3] == self.pawn and self.grid[4] == self.pawn and self.grid[5] == self.pawn
+        H3=self.grid[6] == self.pawn and self.grid[7] == self.pawn and self.grid[8] == self.pawn
+        V1=self.grid[0] == self.pawn and self.grid[3] == self.pawn and self.grid[6] == self.pawn
+        V2=self.grid[1] == self.pawn and self.grid[4] == self.pawn and self.grid[7] == self.pawn
+        V3=self.grid[2] == self.pawn and self.grid[5] == self.pawn and self.grid[8] == self.pawn
+        D1=self.grid[0] == self.pawn and self.grid[4] == self.pawn and self.grid[8] == self.pawn
+        D2=self.grid[2] == self.pawn and self.grid[4] == self.pawn and self.grid[6] == self.pawn
+        return any([H1, H2, H3, V1, V2, V3, D1, D2])
+
+    def grid_draw(self):
+        self.draw.create_line(0, 10, 500, 10)
+        self.draw.create_line(0, 166, 500, 166)
+        self.draw.create_line(0, 332, 500, 332)
+        self.draw.create_line(0, 500, 500, 500)
+        ##############Y##################
+        self.draw.create_line(10, 0, 10, 500)
+        self.draw.create_line(166, 10, 166, 500)
+        self.draw.create_line(332, 10, 332, 500)
+        self.draw.create_line(500, 10, 500, 500)
+
+Morpion()
